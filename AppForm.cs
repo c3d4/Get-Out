@@ -7,7 +7,8 @@ namespace Get_Out_V0._0._1
     public partial class AppForm : Form
     {
         //Weather Variables
-        string weatherC, weatherF;
+        string weatherC = "";
+        string weatherF = "" ;
 
         //Can Drag? Bool
         private bool _dragging;
@@ -21,6 +22,9 @@ namespace Get_Out_V0._0._1
         {
             InitializeComponent();  //Make the form a form
             this.ShowInTaskbar = false; //Don't show program in taskbar
+            this.AccessibleName = "Get Out!";
+            notifyIcon.Icon = Icon;
+            notifyIcon.Text = "Get Out!";
             timerGetTime.Start();   //Start getting the current UI Time
             timerTheme.Start(); //Start Updating theme
             timerCheckCF.Start();   //Start checking if celsius is true or not, same with farhenheit  
@@ -115,8 +119,9 @@ namespace Get_Out_V0._0._1
 
         private void label2_Click(object sender, EventArgs e)
         {
+            showBalloon("Get Out! is still running!", "Get Out! is now in the system tray, so we can still work on telling you if it's nice out :)");
+            this.Visible = false;
             this.WindowState = FormWindowState.Minimized;
-            this.Hide();
         }
         #endregion
 
@@ -148,7 +153,6 @@ namespace Get_Out_V0._0._1
             }
             catch (Exception f)    //Don't catch anything 
             {  
-
             }
 
             //Algorithm that checks the day, time, weather, then notifies you if it's good out 
@@ -158,18 +162,26 @@ namespace Get_Out_V0._0._1
             {
                 if (Properties.Settings.Default.Celsius == true)    //If it's celsius
                 {
-                    int intweatherC = Int32.Parse(weatherC);    //Convert the weather to an int
+                    int intweatherC;
+                    int.TryParse(weatherC, out intweatherC);    //Convert the weather to an int
                     if (intweatherC <= 24 && intweatherC >= 20)
                     {
+                        this.WindowState = FormWindowState.Maximized;
+                        this.WindowState = FormWindowState.Normal;
+                        this.Visible = true;
                         showBalloon("Get Out!", "The temperature is " + labelTemp.Text + "! It's " + labelDesc.Text + " outside!");
                     }
 
                 }
                 else //If it's farenheit
                 {
-                    int intweatherF = Int32.Parse(weatherF);    //Convert the weather to an int
+                    int intweatherF;
+                    int.TryParse(weatherF, out intweatherF);    //Convert the weather to an int
                     if (intweatherF <= 75 && intweatherF >= 69)
                     {
+                        this.WindowState = FormWindowState.Maximized;
+                        this.WindowState = FormWindowState.Normal;
+                        this.Visible = true;
                         showBalloon("Get Out!", "The temperature is " + labelTemp2.Text + "! It's " + labelDesc.Text + " outside!");
                     }
                 }
@@ -199,6 +211,14 @@ namespace Get_Out_V0._0._1
         {
             panel1.BackColor = Color.FromArgb(Properties.Settings.Default.R, Properties.Settings.Default.G, Properties.Settings.Default.B);     //Update the theme from the settings
             this.BackColor = Color.FromArgb(Properties.Settings.Default.R2, Properties.Settings.Default.G2, Properties.Settings.Default.B2);    //Update the back theme from the settings
+            if (Properties.Settings.Default.Celsius == true)
+            {
+                notifyIcon.Text = "The temperature is " + weatherC + "°C";
+            }
+            else
+            {
+                notifyIcon.Text = "The temperature is " + weatherF + "°F";
+            }
         }
 
         #endregion
@@ -210,13 +230,11 @@ namespace Get_Out_V0._0._1
             {
                 labelTemp.Visible = true;   //C is visible
                 labelTemp2.Visible = false;   //F is invisible
-                notifyIcon.Text = "It's currently " + labelTemp.Text + "!";
             }
             else
             {
                 labelTemp.Visible = false;   //C is visible
                 labelTemp2.Visible = true;   //F is invisible
-                notifyIcon.Text = "It's currently " + labelTemp2.Text + "!";
             }
         }
         #endregion
@@ -231,26 +249,27 @@ namespace Get_Out_V0._0._1
         #region Show Notification 
         private void showBalloon(string title, string body)
         {
-            NotifyIcon notifyIcon = new NotifyIcon();
-            notifyIcon.Visible = true;
+            NotifyIcon tryNotifyIcon = new NotifyIcon();
 
-            if (title != null)
-            {
-                notifyIcon.BalloonTipTitle = title;
-            }
-
-            if (body != null)
-            {
-                notifyIcon.BalloonTipText = body;
-            }
-            notifyIcon.Icon = SystemIcons.Application;
-            notifyIcon.ShowBalloonTip(30000);
+            tryNotifyIcon.Visible = true;
+            tryNotifyIcon.BalloonTipTitle = title;
+            tryNotifyIcon.BalloonTipText = body;
+            tryNotifyIcon.Icon = SystemIcons.Information;
+            tryNotifyIcon.ShowBalloonTip(30000);
+            tryNotifyIcon.Dispose();
         }
         #endregion
 
-        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        private void notifyIcon_Click(object sender, EventArgs e)
         {
-                this.WindowState = FormWindowState.Normal;
+            this.WindowState = FormWindowState.Maximized;
+            this.WindowState = FormWindowState.Normal;
+            this.Visible = true;
+        }
+
+        private void timerDispose_Tick(object sender, EventArgs e)
+        {
+            timerDispose.Stop();
         }
     }
 }
