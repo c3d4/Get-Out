@@ -1,0 +1,44 @@
+R:
+  INT
+  USER
+  0
+
+G:
+  INT
+  USER
+  99
+
+B:
+  INT
+  USER
+  212
+
+R2:
+  INT
+  USER
+  34
+
+G2:
+  INT
+  USER
+  45
+
+B2:
+  INT
+  USER
+  57
+
+Celsius:
+  BOOL
+  USER
+  TRUE
+
+Farhenheit:
+  BOOL
+  USER
+  FALSE
+
+DONESETUP:
+  BOOL
+  USER
+  FALSE
